@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dashboard — Monitoring Kandang Puyuh IoT</title>
+    <link rel="icon" href="{{ asset('images/smartquail_logo.png') }}" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -40,6 +41,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        html { scroll-behavior: smooth; }
         body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
         .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .card-hover:hover { transform: translateY(-4px); }
@@ -53,41 +55,49 @@
             0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
             50% { box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
         }
+        /* Navbar scroll effect */
+        .navbar-scrolled {
+            background: rgba(20, 83, 45, 0.95) !important;
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        /* Footer gradient line */
+        .footer-gradient {
+            background: linear-gradient(90deg, #e5e7eb, #9ca3af, #e5e7eb);
+        }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen relative pb-12">
+<body class="bg-gray-50 min-h-screen relative flex flex-col">
 
-    {{-- Top Navigation Bar --}}
-    <nav class="bg-gradient-to-r from-green-900 via-green-800 to-emerald-950 shadow-lg shadow-green-950/20 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/15">
-                        <svg class="w-5 h-5 text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
-                        </svg>
+    {{-- Top Navigation Bar - Fixed & Responsive --}}
+    <nav id="mainNavbar" class="bg-gradient-to-r from-green-900 via-green-800 to-emerald-950 shadow-lg shadow-green-950/20 fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-14 sm:h-16">
+                {{-- Logo & Title --}}
+                <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <img src="{{ asset('images/smartquail_logo.png') }}" alt="SmartQuail Logo" class="w-full h-full object-contain">
                     </div>
-                    <span class="text-white font-extrabold text-lg tracking-tight">Monitoring Kandang Puyuh IoT</span>
+                    <span class="text-white font-extrabold text-sm sm:text-lg tracking-tight truncate">Monitoring Kandang Puyuh IoT</span>
                 </div>
                 
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-lg backdrop-blur-sm border border-white/5">
-                        <div class="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse"></div>
-                        <span class="text-green-200 text-xs font-semibold">IoT Server Online</span>
+                {{-- Right side controls --}}
+                <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+                    {{-- IoT Status Badge --}}
+                    <div class="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-white/10 rounded-lg backdrop-blur-sm border border-white/5">
+                        <div class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-green-400 animate-pulse"></div>
+                        <span class="text-green-200 text-[10px] sm:text-xs font-semibold hidden xs:inline">IoT Server</span>
+                        <span class="text-green-200 text-[10px] sm:text-xs font-semibold xs:hidden">Online</span>
                     </div>
-                    <div class="hidden sm:flex items-center gap-2 text-green-100 text-sm font-medium">
-                        <div class="w-8 h-8 rounded-full bg-emerald-700/50 flex items-center justify-center border border-white/10 text-white font-bold text-xs uppercase">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
-                        </div>
-                        <span>User</span>
-                    </div>
+                    {{-- Logout Button --}}
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="flex items-center gap-1.5 px-3.5 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white rounded-xl text-xs font-semibold transition-all border border-red-500/10">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <button type="submit" class="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-semibold transition-all duration-200 border border-red-500/10 active:scale-95">
+                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
                             </svg>
-                            Logout
+                            <span>Logout</span>
                         </button>
                     </form>
                 </div>
@@ -95,8 +105,11 @@
         </div>
     </nav>
 
+    {{-- Spacer for fixed navbar --}}
+    <div class="h-14 sm:h-16"></div>
+
     {{-- Main Container --}}
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-grow">
 
         {{-- Welcome Toast (appears once on login, then fades) --}}
         <div id="welcomeToast" class="mb-4 bg-gradient-to-r from-green-800 to-emerald-700 rounded-xl px-4 py-3 text-white shadow-md border border-green-700/50 flex items-center justify-between gap-3 transition-all duration-500 opacity-0 translate-y-2" style="display:none;">
@@ -366,6 +379,32 @@
         </div>
 
     </main>
+
+    {{-- Footer - White with black text --}}
+    <footer class="w-full mt-auto">
+        <div class="footer-gradient h-[2px]"></div>
+        <div class="bg-white border-t border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    {{-- Left: University Branding --}}
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            <img src="{{ asset('images/uhn_logo.png') }}" alt="Logo UHN" class="w-full h-full object-contain">
+                        </div>
+                        <div>
+                            <p class="text-gray-900 font-bold text-xs sm:text-sm tracking-wide uppercase">Universitas Harkat Negeri</p>
+                            <p class="text-gray-500 text-[10px] sm:text-xs font-medium tracking-wider uppercase">Prodi Teknik Komputer</p>
+                        </div>
+                    </div>
+                    {{-- Right: Copyright --}}
+                    <div class="text-center sm:text-right">
+                        <p class="text-gray-800 text-xs sm:text-sm font-semibold">&copy; {{ date('Y') }} Tugas Akhir</p>
+                        <p class="text-gray-400 text-[10px] sm:text-xs font-medium tracking-wider uppercase">All Rights Reserved</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     {{-- Toast Notification Container --}}
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full px-4 sm:px-0"></div>
@@ -763,6 +802,27 @@
             // Auto-dismiss after 3 seconds
             setTimeout(dismissWelcome, 3000);
         })();
+
+        // Navbar scroll effect - add shadow and blur on scroll
+        const navbar = document.getElementById('mainNavbar');
+        let lastScrollY = 0;
+        let ticking = false;
+
+        function handleNavbarScroll() {
+            if (window.scrollY > 10) {
+                navbar.classList.add('navbar-scrolled');
+            } else {
+                navbar.classList.remove('navbar-scrolled');
+            }
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(handleNavbarScroll);
+                ticking = true;
+            }
+        }, { passive: true });
     </script>
 </body>
 </html>

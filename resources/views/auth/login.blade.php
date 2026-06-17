@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Login Sistem Monitoring Kandang Puyuh IoT">
     <title>Login — Monitoring Kandang Puyuh IoT</title>
+    <link rel="icon" href="{{ asset('images/smartquail_logo.png') }}" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -128,8 +129,31 @@
             @endif
         </div>
 
-        <p class="text-center text-green-300/40 text-xs mt-8 font-medium">&copy; {{ date('Y') }} Monitoring Kandang Puyuh IoT</p>
     </div>
+
+    {{-- Footer --}}
+    <footer class="fixed bottom-0 left-0 right-0 z-20">
+        <div style="height:2px; background: linear-gradient(90deg, #e5e7eb, #9ca3af, #e5e7eb);"></div>
+        <div class="bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            <img src="{{ asset('images/uhn_logo.png') }}" alt="Logo UHN" class="w-full h-full object-contain">
+                        </div>
+                        <div>
+                            <p class="text-gray-900 font-bold text-[10px] sm:text-xs tracking-wide uppercase">Universitas Harkat Negeri</p>
+                            <p class="text-gray-500 text-[9px] sm:text-[10px] font-medium tracking-wider uppercase">Prodi Teknik Komputer</p>
+                        </div>
+                    </div>
+                    <div class="text-center sm:text-right">
+                        <p class="text-gray-800 text-[10px] sm:text-xs font-semibold">&copy; {{ date('Y') }} Tugas Akhir</p>
+                        <p class="text-gray-400 text-[9px] sm:text-[10px] font-medium tracking-wider uppercase">All Rights Reserved</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script>
         function togglePassword() {
