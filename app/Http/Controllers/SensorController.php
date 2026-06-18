@@ -32,16 +32,29 @@ class SensorController extends Controller
             ]);
         }
 
-        return response()->json([
-            'suhu' => $latest->suhu,
-            'kelembapan' => $latest->kelembapan,
-            'amonia' => $latest->amonia,
-            'status' => $latest->status,
-            'created_at' => $latest->created_at->format('Y-m-d H:i:s'),
-            'sprayer_active' => (bool) $latest->sprayer_active,
-            'kipas_active' => (bool) $latest->kipas_active,
-            'lampu_active' => (bool) $latest->lampu_active,
-        ]);
+        $latestSprayer = SprayerLog::latest('id')->first();
+$latestKipas   = KipasLog::latest('id')->first();
+$latestLampu   = LampuLog::latest('id')->first();
+
+return response()->json([
+    'suhu' => $latest->suhu,
+    'kelembapan' => $latest->kelembapan,
+    'amonia' => $latest->amonia,
+    'status' => $latest->status,
+    'created_at' => $latest->created_at->format('Y-m-d H:i:s'),
+
+    'sprayer_active' => $latestSprayer
+        ? ($latestSprayer->aksi === 'aktif')
+        : false,
+
+    'kipas_active' => $latestKipas
+        ? ($latestKipas->aksi === 'aktif')
+        : false,
+
+    'lampu_active' => $latestLampu
+        ? ($latestLampu->aksi === 'aktif')
+        : false,
+]);
     }
 
     /**
@@ -50,8 +63,11 @@ class SensorController extends Controller
      */
     public function toggleSprayer(Request $request)
     {
-        $latestSensor = SensorData::latest('id')->first();
-        $currentlyActive = $latestSensor ? (bool)$latestSensor->sprayer_active : false;
+        $latestSprayer = SprayerLog::latest('id')->first();
+
+        $currentlyActive = $latestSprayer
+            ? ($latestSprayer->aksi === 'aktif')
+            : false;
 
         $newAction = $currentlyActive ? 'nonaktif' : 'aktif';
 
@@ -75,8 +91,11 @@ class SensorController extends Controller
      */
     public function toggleKipas(Request $request)
     {
-        $latestSensor = SensorData::latest('id')->first();
-        $currentlyActive = $latestSensor ? (bool)$latestSensor->kipas_active : false;
+        $latestKipas = KipasLog::latest('id')->first();
+
+$currentlyActive = $latestKipas
+    ? ($latestKipas->aksi === 'aktif')
+    : false;
 
         $newAction = $currentlyActive ? 'nonaktif' : 'aktif';
 
@@ -100,8 +119,11 @@ class SensorController extends Controller
      */
     public function toggleLampu(Request $request)
     {
-        $latestSensor = SensorData::latest('id')->first();
-        $currentlyActive = $latestSensor ? (bool)$latestSensor->lampu_active : false;
+        $latestLampu = LampuLog::latest('id')->first();
+
+$currentlyActive = $latestLampu
+    ? ($latestLampu->aksi === 'aktif')
+    : false;
 
         $newAction = $currentlyActive ? 'nonaktif' : 'aktif';
 
