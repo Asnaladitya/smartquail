@@ -25,7 +25,7 @@
                             '50%': { opacity: '0.6', transform: 'scale(0.98)' }
                         },
                         slideIn: {
-                            '0%': { transform: 'translateX(100%) translateY(20px)', opacity: '0' },
+                            '0%': { transform: 'translateX(100%) translateY(-20px)', opacity: '0' },
                             '100%': { transform: 'translateX(0) translateY(0)', opacity: '1' }
                         },
                         slideOut: {
@@ -407,11 +407,16 @@
     </footer>
 
     {{-- Toast Notification Container --}}
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full px-4 sm:px-0"></div>
+    <div id="toastContainer" class="fixed top-20 right-5 z-50 flex flex-col gap-3 max-w-sm w-full px-4 sm:px-0"></div>
 
     {{-- JavaScript Logic --}}
     <script>
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        // UI Locks to prevent polling from overwriting manual button clicks
+        let isSprayerLocked = false;
+        let isKipasLocked = false;
+        let isLampuLocked = false;
 
         // Dynamic Jam
         function updateTime() {
@@ -531,6 +536,8 @@
                 showToast("⚠️ Gagal berkomunikasi dengan server sprayer.", "error");
             } finally {
                 btn.disabled = false;
+                isSprayerLocked = true;
+                setTimeout(() => { isSprayerLocked = false; }, 8000); // Kunci UI dari polling selama 8 detik
             }
         }
 
@@ -580,6 +587,8 @@
                 showToast("⚠️ Gagal berkomunikasi dengan server kipas.", "error");
             } finally {
                 btn.disabled = false;
+                isKipasLocked = true;
+                setTimeout(() => { isKipasLocked = false; }, 8000); // Kunci UI dari polling selama 8 detik
             }
         }
 
@@ -629,6 +638,8 @@
                 showToast("⚠️ Gagal berkomunikasi dengan server lampu.", "error");
             } finally {
                 btn.disabled = false;
+                isLampuLocked = true;
+                setTimeout(() => { isLampuLocked = false; }, 8000); // Kunci UI dari polling selama 8 detik
             }
         }
 
@@ -733,10 +744,10 @@
                 amoniaBar.className = "bg-gradient-to-r from-purple-400 to-purple-500 h-2.5 rounded-full transition-all duration-500";
             }
 
-            // Sync Sprayer, Kipas & Lampu button state from server telemetries
-            updateSprayerButton(data.sprayer_active);
-            updateKipasButton(data.kipas_active);
-            updateLampuButton(data.lampu_active);
+            // Sync Sprayer, Kipas & Lampu button state from server telemetries (hanya jika tidak dikunci)
+            if (!isSprayerLocked) updateSprayerButton(data.sprayer_active);
+            if (!isKipasLocked) updateKipasButton(data.kipas_active);
+            if (!isLampuLocked) updateLampuButton(data.lampu_active);
 
             // Update Actuator Status Indicators
             updateActuatorStatus('kipas', data.kipas_active);

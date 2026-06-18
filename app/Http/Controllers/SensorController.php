@@ -50,8 +50,8 @@ class SensorController extends Controller
      */
     public function toggleSprayer(Request $request)
     {
-        $latestSprayer = SprayerLog::latest('id')->first();
-        $currentlyActive = $latestSprayer ? ($latestSprayer->aksi === 'aktif') : false;
+        $latestSensor = SensorData::latest('id')->first();
+        $currentlyActive = $latestSensor ? (bool)$latestSensor->sprayer_active : false;
 
         $newAction = $currentlyActive ? 'nonaktif' : 'aktif';
 
@@ -75,8 +75,8 @@ class SensorController extends Controller
      */
     public function toggleKipas(Request $request)
     {
-        $latestKipas = KipasLog::latest('id')->first();
-        $currentlyActive = $latestKipas ? ($latestKipas->aksi === 'aktif') : false;
+        $latestSensor = SensorData::latest('id')->first();
+        $currentlyActive = $latestSensor ? (bool)$latestSensor->kipas_active : false;
 
         $newAction = $currentlyActive ? 'nonaktif' : 'aktif';
 
@@ -100,8 +100,8 @@ class SensorController extends Controller
      */
     public function toggleLampu(Request $request)
     {
-        $latestLampu = LampuLog::latest('id')->first();
-        $currentlyActive = $latestLampu ? ($latestLampu->aksi === 'aktif') : false;
+        $latestSensor = SensorData::latest('id')->first();
+        $currentlyActive = $latestSensor ? (bool)$latestSensor->lampu_active : false;
 
         $newAction = $currentlyActive ? 'nonaktif' : 'aktif';
 
@@ -192,6 +192,9 @@ class SensorController extends Controller
             'sprayer_active' => $sprayerActive,
             'kipas_active' => $kipasActive,
             'lampu_active' => $lampuActive,
+            'sprayer_ts' => $latestSprayer ? $latestSprayer->created_at->timestamp : 0,
+            'kipas_ts' => $latestKipas ? $latestKipas->created_at->timestamp : 0,
+            'lampu_ts' => $latestLampu ? $latestLampu->created_at->timestamp : 0,
         ]);
     }
 }
