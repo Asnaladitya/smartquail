@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dashboard — Monitoring Kandang Puyuh IoT</title>
-    <link rel="icon" href="{{ asset('images/smartquail_logo.png') }}" type="image/png">
+    <link class="w-full h-full object-contain" rel="icon" href="{{ asset('images/smartquail_logo.png') }}" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -16,8 +16,9 @@
                     },
                     animation: {
                         'blink': 'blink 1.5s infinite',
-                        'slide-in': 'slideIn 0.3s ease-out forwards',
+                        'slide-in': 'slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'slide-out': 'slideOut 0.3s ease-in forwards',
+                        'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     },
                     keyframes: {
                         blink: {
@@ -25,12 +26,16 @@
                             '50%': { opacity: '0.6', transform: 'scale(0.98)' }
                         },
                         slideIn: {
-                            '0%': { transform: 'translateX(100%) translateY(-20px)', opacity: '0' },
+                            '0%': { transform: 'translateX(120%) translateY(-20px)', opacity: '0' },
                             '100%': { transform: 'translateX(0) translateY(0)', opacity: '1' }
                         },
                         slideOut: {
                             '0%': { transform: 'translateX(0)', opacity: '1' },
                             '100%': { transform: 'translateX(120%)', opacity: '0' }
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '1', transform: 'scale(1)', filter: 'brightness(1)' },
+                            '50%': { opacity: '0.8', transform: 'scale(0.98)', filter: 'brightness(1.15)' }
                         }
                     }
                 }
@@ -42,59 +47,75 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         html { scroll-behavior: smooth; }
-        body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
-        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .card-hover:hover { transform: translateY(-4px); }
-        .pulse-ring { animation: pulseRing 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulseRing {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-            50% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+        body { 
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            background-color: #f8fafc; /* bg-slate-50 */
         }
-        .pulse-ring-active { animation: pulseRingActive 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulseRingActive {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
-            50% { box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
+        .card-hover { 
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        .card-hover:hover { 
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 10px 10px -5px rgba(15, 23, 42, 0.04);
+        }
+        .pulse-ring-blue { animation: pulseRingBlue 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulseRingBlue {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.35); }
+            50% { box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); }
+        }
+        .pulse-ring-green { animation: pulseRingGreen 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulseRingGreen {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.35); }
+            50% { box-shadow: 0 0 0 12px rgba(34, 197, 94, 0); }
+        }
+        .pulse-ring-amber { animation: pulseRingAmber 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulseRingAmber {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.35); }
+            50% { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
         }
         /* Navbar scroll effect */
         .navbar-scrolled {
-            background: rgba(20, 83, 45, 0.95) !important;
-            backdrop-filter: blur(12px) saturate(180%);
-            -webkit-backdrop-filter: blur(12px) saturate(180%);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        /* Footer gradient line */
-        .footer-gradient {
-            background: linear-gradient(90deg, #e5e7eb, #9ca3af, #e5e7eb);
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(16px) saturate(180%);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen relative flex flex-col">
+<body class="text-slate-800 min-h-screen relative flex flex-col overflow-x-hidden selection:bg-green-500/20 selection:text-green-800 bg-slate-50/50">
 
-    {{-- Top Navigation Bar - Fixed & Responsive --}}
-    <nav id="mainNavbar" class="bg-gradient-to-r from-green-900 via-green-800 to-emerald-950 shadow-lg shadow-green-950/20 fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-14 sm:h-16">
+    {{-- Glowing Decorative Blobs (Soft Opacity in Light Mode) --}}
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute -top-40 -left-40 w-[450px] h-[450px] bg-emerald-500/5 rounded-full filter blur-[100px]"></div>
+        <div class="absolute top-[40%] -right-40 w-[400px] h-[400px] bg-blue-500/5 rounded-full filter blur-[100px]"></div>
+        <div class="absolute -bottom-45 left-1/3 w-[500px] h-[500px] bg-purple-500/5 rounded-full filter blur-[100px]"></div>
+    </div>
+
+    {{-- Top Navigation Bar - Fixed & Transparent White Glass --}}
+    <nav id="mainNavbar" class="bg-white/80 backdrop-blur-md shadow-sm shadow-slate-100 fixed top-0 left-0 right-0 z-50 border-b border-slate-200/50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
                 {{-- Logo & Title --}}
-                <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink">
-                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
+                <div class="flex items-center gap-3 min-w-0 flex-shrink flex-row">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden bg-slate-50 border border-slate-200/60 p-0.5 shadow-sm">
                         <img src="{{ asset('images/smartquail_logo.png') }}" alt="SmartQuail Logo" class="w-full h-full object-contain">
                     </div>
-                    <span class="text-white font-extrabold text-sm sm:text-lg tracking-tight truncate">Monitoring Kandang Puyuh IoT</span>
+                    <span class="text-slate-850 font-extrabold text-sm sm:text-base tracking-tight truncate bg-gradient-to-r from-emerald-800 to-green-700 bg-clip-text text-transparent">SmartQuail Dashboard</span>
                 </div>
                 
                 {{-- Right side controls --}}
-                <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+                <div class="flex items-center gap-3 flex-shrink-0">
                     {{-- IoT Status Badge --}}
-                    <div class="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-white/10 rounded-lg backdrop-blur-sm border border-white/5">
-                        <div class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-green-400 animate-pulse"></div>
-                        <span class="text-green-200 text-[10px] sm:text-xs font-semibold hidden xs:inline">IoT Server</span>
-                        <span class="text-green-200 text-[10px] sm:text-xs font-semibold xs:hidden">Online</span>
+                    <div class="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 rounded-xl border border-emerald-200/50">
+                        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]"></div>
+                        <span class="text-emerald-700 text-[10px] sm:text-xs font-semibold hidden sm:inline">Server IoT Aktif</span>
+                        <span class="text-emerald-700 text-[10px] sm:text-xs font-semibold sm:hidden">Online</span>
                     </div>
                     {{-- Logout Button --}}
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-semibold transition-all duration-200 border border-red-500/10 active:scale-95">
-                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <button type="submit" class="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 rounded-xl text-[10px] sm:text-xs font-bold transition-all duration-200 border border-red-200/50 active:scale-95">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
                             </svg>
                             <span>Logout</span>
@@ -106,225 +127,240 @@
     </nav>
 
     {{-- Spacer for fixed navbar --}}
-    <div class="h-14 sm:h-16"></div>
+    <div class="h-16"></div>
 
     {{-- Main Container --}}
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-grow">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-grow w-full z-10 relative">
 
-        {{-- Welcome Toast (appears once on login, then fades) --}}
-        <div id="welcomeToast" class="mb-4 bg-gradient-to-r from-green-800 to-emerald-700 rounded-xl px-4 py-3 text-white shadow-md border border-green-700/50 flex items-center justify-between gap-3 transition-all duration-500 opacity-0 translate-y-2" style="display:none;">
-            <div class="flex items-center gap-2.5">
-                <span class="text-lg">👋</span>
-                <p class="text-sm font-semibold">Selamat Datang, {{ Auth::user()->name }}!</p>
+        {{-- Welcome Toast --}}
+        <div id="welcomeToast" class="mb-6 bg-gradient-to-r from-emerald-800 to-green-700 rounded-2xl px-5 py-4 text-white shadow-lg border border-emerald-600/30 flex items-center justify-between gap-3 transition-all duration-500 opacity-0 translate-y-2" style="display:none;">
+            <div class="flex items-center gap-3.5">
+                <span class="text-2xl animate-bounce">👋</span>
+                <div>
+                    <p class="text-sm font-bold text-white">Selamat Datang, {{ Auth::user()->name }}!</p>
+                    <p class="text-xs text-slate-100/90 mt-0.5">Sistem IoT Kandang Puyuh siap dipantau.</p>
+                </div>
             </div>
-            <button onclick="dismissWelcome()" class="text-white/60 hover:text-white transition-colors">
+            <button onclick="dismissWelcome()" class="text-white/80 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-1.5 rounded-lg">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
         </div>
 
         {{-- Date/Time Bar --}}
-        <div class="mb-5 flex items-center justify-between">
-            <h1 class="text-base font-bold text-gray-800 tracking-tight">Dashboard Monitoring</h1>
-            <div class="flex items-center gap-2.5 px-3.5 py-2 bg-white rounded-xl border border-gray-100 shadow-sm">
-                <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Dashboard Monitoring</h1>
+                <p class="text-xs text-slate-500 mt-1">Status dan kendali lingkungan kandang puyuh pintar secara real-time</p>
+            </div>
+            <div class="flex items-center gap-2.5 px-4 py-2 bg-white rounded-2xl border border-slate-200 shadow-sm w-fit">
+                <svg class="w-4 h-4 text-emerald-650 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span class="text-xs font-semibold text-gray-600" id="currentTime">Loading jam...</span>
+                <span class="text-xs font-semibold text-slate-700" id="currentTime">Loading jam...</span>
             </div>
         </div>
 
-        {{-- Telemetry Sensor Grid (Suhu, Kelembapan, Amonia, Telur) --}}
-<div class="mb-4 flex items-center justify-between">
-    <h2 class="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
-        <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
-        </svg>
-        Telemetri Sensor Real-Time
-    </h2>
-            <div class="flex items-center gap-1.5 text-xs text-gray-400 font-semibold bg-white border border-gray-150 px-3 py-1.5 rounded-xl">
-                <svg class="animate-spin w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24">
+        {{-- Telemetry Sensor Header --}}
+        <div class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+                </svg>
+                Telemetri Sensor Real-Time
+            </h2>
+            <div class="flex items-center gap-2 text-xs text-slate-500 font-semibold bg-white border border-slate-200 px-3.5 py-2 rounded-xl w-fit shadow-2xs">
+                <svg class="animate-spin w-3.5 h-3.5 text-emerald-650" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span>Update tiap 5 detik</span>
+                <span>Sinkronisasi telemetri (5s)</span>
             </div>
         </div>
 
+        {{-- Telemetry Cards Grid --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
             {{-- 1. Suhu --}}
-            <div id="suhuCard" class="card-hover bg-white rounded-3xl p-6 border border-gray-100 shadow-sm transition-all duration-300">
+            <div id="suhuCard" class="card-hover bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm transition-all duration-350">
                 <div class="flex items-center justify-between mb-4">
-                    <div id="suhuIconBg" class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center transition-colors">
-                        <svg id="suhuIcon" class="w-6 h-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <div id="suhuIconBg" class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 transition-colors">
+                        <svg id="suhuIcon" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" />
                         </svg>
                     </div>
-                    <span id="suhuBadge" class="px-3 py-1 bg-green-150 text-green-700 text-xs font-bold rounded-full uppercase tracking-wider">
+                    <span id="suhuBadge" class="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-full border border-green-200 uppercase tracking-wider">
                         Normal
                     </span>
                 </div>
-                <p class="text-sm text-gray-500 font-semibold uppercase tracking-wider">Suhu Kandang</p>
+                <p class="text-sm text-slate-450 font-semibold uppercase tracking-wider">Suhu Kandang</p>
                 <div class="flex items-baseline mt-2">
-                    <span id="suhuVal" class="text-5xl font-extrabold text-gray-800 transition-colors">--</span>
-                    <span class="text-xl text-gray-400 font-bold ml-1">°C</span>
+                    <span id="suhuVal" class="text-5xl font-extrabold text-slate-800 tracking-tight transition-colors">--</span>
+                    <span class="text-xl text-slate-400 font-bold ml-1">°C</span>
                 </div>
                 {{-- Progress bar --}}
-                <div class="mt-4 w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                <div class="mt-4 w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
                     <div id="suhuBar" class="bg-gradient-to-r from-orange-400 to-orange-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
                 </div>
-                <div class="flex justify-between items-center text-2xs text-gray-400 mt-2.5 font-bold uppercase">
+                <div class="flex justify-between items-center text-2xs text-slate-450 mt-2.5 font-bold uppercase">
                     <span>Min: 20°C</span>
                     <span>Max: 42°C</span>
                 </div>
             </div>
 
             {{-- 2. Kelembapan --}}
-            <div id="kelembapanCard" class="card-hover bg-white rounded-3xl p-6 border border-gray-100 shadow-sm transition-all duration-300">
+            <div id="kelembapanCard" class="card-hover bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm transition-all duration-350">
                 <div class="flex items-center justify-between mb-4">
-                    <div id="kelembapanIconBg" class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center transition-colors">
-                        <svg id="kelembapanIcon" class="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <div id="kelembapanIconBg" class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 transition-colors">
+                        <svg id="kelembapanIcon" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 3.75c-4.97 4.97-7.5 8.47-7.5 11.25a7.5 7.5 0 0015 0c0-2.78-2.53-6.28-7.5-11.25z" />
                         </svg>
                     </div>
-                    <span id="kelembapanBadge" class="px-3 py-1 bg-green-150 text-green-700 text-xs font-bold rounded-full uppercase tracking-wider">
+                    <span id="kelembapanBadge" class="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-full border border-green-200 uppercase tracking-wider">
                         Normal
                     </span>
                 </div>
-                <p class="text-sm text-gray-500 font-semibold uppercase tracking-wider">Kelembapan Udara</p>
+                <p class="text-sm text-slate-450 font-semibold uppercase tracking-wider">Kelembapan Udara</p>
                 <div class="flex items-baseline mt-2">
-                    <span id="kelembapanVal" class="text-5xl font-extrabold text-gray-800 transition-colors">--</span>
-                    <span class="text-xl text-gray-400 font-bold ml-1">%</span>
+                    <span id="kelembapanVal" class="text-5xl font-extrabold text-slate-800 tracking-tight transition-colors">--</span>
+                    <span class="text-xl text-slate-400 font-bold ml-1">%</span>
                 </div>
-                <div class="mt-4 w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                <div class="mt-4 w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
                     <div id="kelembapanBar" class="bg-gradient-to-r from-blue-400 to-blue-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
                 </div>
-                <div class="flex justify-between items-center text-2xs text-gray-400 mt-2.5 font-bold uppercase">
+                <div class="flex justify-between items-center text-2xs text-slate-450 mt-2.5 font-bold uppercase">
                     <span>Min: 30%</span>
                     <span>Max: 100%</span>
                 </div>
             </div>
 
             {{-- 3. Amonia --}}
-            <div id="amoniaCard" class="card-hover bg-white rounded-3xl p-6 border border-gray-100 shadow-sm transition-all duration-300">
+            <div id="amoniaCard" class="card-hover bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm transition-all duration-350">
                 <div class="flex items-center justify-between mb-4">
-                    <div id="amoniaIconBg" class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center transition-colors">
-                        <svg id="amoniaIcon" class="w-6 h-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <div id="amoniaIconBg" class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-500 transition-colors">
+                        <svg id="amoniaIcon" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
                     </div>
-                    <span id="amoniaBadge" class="px-3 py-1 bg-green-150 text-green-700 text-xs font-bold rounded-full uppercase tracking-wider">
+                    <span id="amoniaBadge" class="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-full border border-green-200 uppercase tracking-wider">
                         Normal
                     </span>
                 </div>
-                <p class="text-sm text-gray-500 font-semibold uppercase tracking-wider">Gas Amonia (NH₃)</p>
+                <p class="text-sm text-slate-455 font-semibold uppercase tracking-wider">Gas Amonia (NH₃)</p>
                 <div class="flex items-baseline mt-2">
-                    <span id="amoniaVal" class="text-5xl font-extrabold text-gray-800 transition-colors">--</span>
-                    <span class="text-xl text-gray-400 font-bold ml-1"> ppm</span>
+                    <span id="amoniaVal" class="text-5xl font-extrabold text-slate-800 tracking-tight transition-colors">--</span>
+                    <span class="text-xl text-slate-400 font-bold ml-1"> ppm</span>
                 </div>
-                <div class="mt-4 w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                <div class="mt-4 w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
                     <div id="amoniaBar" class="bg-gradient-to-r from-purple-400 to-purple-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
                 </div>
-                <div class="flex justify-between items-center text-2xs text-gray-400 mt-2.5 font-bold uppercase">
+                <div class="flex justify-between items-center text-2xs text-slate-450 mt-2.5 font-bold uppercase">
                     <span>Aman: &lt;2.5 ppm</span>
                     <span>Bahaya: &gt;15.0 ppm</span>
                 </div>
             </div>
 
-
         </div>
 
         {{-- Status Aktuator Real-time dari ESP8266 --}}
-        <div class="mt-6 mb-5 bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5">
-            <h2 class="text-sm font-semibold text-gray-700 flex items-center gap-1.5 mb-4">
-                <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <div class="mt-8 mb-6 bg-white rounded-3xl border border-slate-200/80 shadow-sm p-5 sm:p-6">
+            <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2 mb-5">
+                <svg class="w-4 h-4 text-emerald-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728m-9.9-2.829a5 5 0 010-7.07m7.072 0a5 5 0 010 7.07M13 12a1 1 0 11-2 0 1 1 0 012 0z" />
                 </svg>
                 Status Aktuator Kandang (dari ESP8266)
             </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {{-- Kipas --}}
-                <div class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50/50">
-                    <div id="kipasStatusIcon" class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
+                <div class="flex items-center justify-between p-4 rounded-2xl border border-slate-150 bg-slate-50/50">
+                    <div class="flex items-center gap-3">
+                        <div id="kipasStatusIcon" class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0 transition-all duration-300">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wider">Kipas (IN1)</p>
+                            <span id="kipasStatusText" class="text-sm font-bold text-slate-450 transition-colors">MATI</span>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Kipas (IN1)</p>
-                        <span id="kipasStatusText" class="text-sm font-bold text-gray-400">MATI</span>
-                    </div>
+                    <div id="kipasLed" class="w-3 h-3 rounded-full bg-slate-200 transition-all duration-300 shadow-sm border border-slate-300/30"></div>
                 </div>
                 {{-- Pompa/Sprayer --}}
-                <div class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50/50">
-                    <div id="pompaStatusIcon" class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3.75c-4.97 4.97-7.5 8.47-7.5 11.25a7.5 7.5 0 0015 0c0-2.78-2.53-6.28-7.5-11.25z" />
-                        </svg>
+                <div class="flex items-center justify-between p-4 rounded-2xl border border-slate-150 bg-slate-50/50">
+                    <div class="flex items-center gap-3">
+                        <div id="pompaStatusIcon" class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0 transition-all duration-300">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3.75c-4.97 4.97-7.5 8.47-7.5 11.25a7.5 7.5 0 0015 0c0-2.78-2.53-6.28-7.5-11.25z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wider">Pompa/Sprayer (IN2)</p>
+                            <span id="pompaStatusText" class="text-sm font-bold text-slate-450 transition-colors">MATI</span>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Pompa/Sprayer (IN2)</p>
-                        <span id="pompaStatusText" class="text-sm font-bold text-gray-400">MATI</span>
-                    </div>
+                    <div id="pompaLed" class="w-3 h-3 rounded-full bg-slate-200 transition-all duration-300 shadow-sm border border-slate-300/30"></div>
                 </div>
                 {{-- Lampu --}}
-                <div class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50/50">
-                    <div id="lampuStatusIcon" class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
-                        </svg>
+                <div class="flex items-center justify-between p-4 rounded-2xl border border-slate-150 bg-slate-50/50">
+                    <div class="flex items-center gap-3">
+                        <div id="lampuStatusIcon" class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0 transition-all duration-300">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wider">Lampu Pemanas (IN3)</p>
+                            <span id="lampuStatusText" class="text-sm font-bold text-slate-450 transition-colors">MATI</span>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Lampu Pemanas (IN3)</p>
-                        <span id="lampuStatusText" class="text-sm font-bold text-gray-400">MATI</span>
-                    </div>
+                    <div id="lampuLed" class="w-3 h-3 rounded-full bg-slate-200 transition-all duration-300 shadow-sm border border-slate-300/30"></div>
                 </div>
             </div>
         </div>
 
         {{-- Equipment Controls Panel --}}
-<div class="mb-5 bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-4 border-b border-gray-100">
-        <div>
-            <h2 class="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
-                <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                Panel Kontrol Peralatan
-            </h2>
-                    <p class="text-sm text-gray-500 mt-0.5">Kontrol langsung aktuator kandang secara manual</p>
+        <div class="mb-8 bg-white rounded-3xl border border-slate-200/80 shadow-sm p-5 sm:p-6">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
+                <div>
+                    <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Panel Kontrol Peralatan
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">Kontrol langsung aktuator kandang secara manual</p>
                 </div>
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-400 font-medium">Kipas:</span>
-                        <span id="kipasStatusBadge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600">NONAKTIF</span>
+                <div class="flex flex-wrap gap-3">
+                    <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                        <span class="text-2xs sm:text-xs text-slate-500 font-semibold">Kipas:</span>
+                        <span id="kipasStatusBadge" class="px-2 py-0.5 rounded-full text-2xs font-extrabold bg-slate-100 text-slate-500 border border-slate-200 uppercase">NONAKTIF</span>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-400 font-medium">Sprayer:</span>
-                        <span id="sprayerStatusBadge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600">NONAKTIF</span>
+                    <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                        <span class="text-2xs sm:text-xs text-slate-500 font-semibold">Sprayer:</span>
+                        <span id="sprayerStatusBadge" class="px-2 py-0.5 rounded-full text-2xs font-extrabold bg-slate-100 text-slate-500 border border-slate-200 uppercase">NONAKTIF</span>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-400 font-medium">Lampu:</span>
-                        <span id="lampuStatusBadge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600">NONAKTIF</span>
+                    <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                        <span class="text-2xs sm:text-xs text-slate-500 font-semibold">Lampu:</span>
+                        <span id="lampuStatusBadge" class="px-2 py-0.5 rounded-full text-2xs font-extrabold bg-slate-100 text-slate-500 border border-slate-200 uppercase">NONAKTIF</span>
                     </div>
                 </div>
             </div>
 
             <!-- Kipas Control -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center mb-6 pb-6 border-b border-gray-100">
-                <div class="md:col-span-2">
-                    <h3 class="text-base font-bold text-gray-700">Kipas Pendingin / Sirkulasi Udara (Fan)</h3>
-                    <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">
-                        Aktifkan kipas secara manual untuk memperlancar sirkulasi udara atau membuang bau amonia yang menyengat sebelum mencapai ambang batas berbahaya.
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center mb-6 pb-6 border-b border-slate-100">
+                <div class="lg:col-span-2">
+                    <h3 class="text-base font-bold text-gray-800">Kipas Pendingin / Sirkulasi Udara (Fan)</h3>
+                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">
+                        Aktifkan kipas pendingin secara manual untuk memperlancar sirkulasi udara atau membuang bau amonia yang menyengat sebelum mencapai ambang batas otomatis.
                     </p>
                 </div>
-                <div class="flex justify-center md:justify-end">
+                <div class="flex justify-end">
                     <button
                         type="button"
                         id="kipasBtn"
                         onclick="toggleKipas()"
-                        class="w-full sm:w-auto px-8 py-5 text-white font-extrabold text-sm rounded-2xl tracking-wide transition-all shadow-md active:scale-95 duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-500 focus:outline-none"
+                        class="w-full sm:w-auto px-6 py-3.5 text-slate-700 font-bold text-sm rounded-xl tracking-wide transition-all shadow-sm active:scale-95 duration-300 bg-slate-100 hover:bg-slate-200 border border-slate-300 focus:outline-none"
                     >
                         💨 Aktifkan Kipas Manual
                     </button>
@@ -332,74 +368,74 @@
             </div>
 
             <!-- Sprayer Control -->
-                <div class="md:col-span-2">
-                    <h3 class="text-base font-bold text-gray-700">Penyemprot Cairan Penetral Amonia (Sprayer)</h3>
-                    <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">
-                        Zat amonia yang tinggi (>15.0 ppm) berbahaya bagi puyuh. Aktifkan penyemprot cairan penetral untuk menurunkan kadar gas amonia secara instan.
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center mb-6 pb-6 border-b border-slate-100">
+                <div class="lg:col-span-2">
+                    <h3 class="text-base font-bold text-gray-800">Penyemprot Cairan Penetral Amonia (Sprayer)</h3>
+                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">
+                        Zat amonia yang tinggi (>25.0 ppm) berbahaya bagi puyuh. Aktifkan penyemprot cairan penetral untuk menurunkan kadar gas secara cepat.
                     </p>
-                    <div class="flex items-center gap-2.5 mt-3 text-xs font-semibold text-yellow-700 bg-yellow-50 px-3.5 py-2.5 rounded-xl border border-yellow-100 w-fit">
-                        <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <div class="flex items-center gap-2 mt-3 text-2xs font-semibold text-amber-700 bg-amber-50 px-3.5 py-2 rounded-xl border border-amber-200 w-fit">
+                        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
-                        Ambang Batas Keamanan: Suhu &gt;35°C | Amonia &gt;15.0 ppm | Kelembapan &lt;40% atau &gt;80%
+                        Ambang Batas Keamanan: Suhu &gt;35°C | Amonia &gt;25.0 ppm | Kelembapan &lt;40% atau &gt;80%
                     </div>
                 </div>
-                <div class="flex justify-center md:justify-end">
+                <div class="flex justify-end">
                     <button
                         type="button"
                         id="sprayerBtn"
                         onclick="toggleSprayer()"
-                        class="w-full sm:w-auto px-8 py-5 text-white font-extrabold text-sm rounded-2xl tracking-wide transition-all shadow-md active:scale-95 duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-red-600 hover:bg-red-500 pulse-ring focus:outline-none"
+                        class="w-full sm:w-auto px-6 py-3.5 text-slate-700 font-bold text-sm rounded-xl tracking-wide transition-all shadow-sm active:scale-95 duration-300 bg-slate-100 hover:bg-slate-200 border border-slate-300 focus:outline-none"
                     >
                         🚨 Aktifkan Penyemprot Amonia
                     </button>
                 </div>
+            </div>
 
             <!-- Lampu Pemanas Control -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center mt-6 pt-6 border-t border-gray-100">
-                <div class="md:col-span-2">
-                    <h3 class="text-base font-bold text-gray-700">Lampu Pemanas (Heater Lamp)</h3>
-                    <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">
-                        Aktifkan lampu pemanas secara manual untuk menghangatkan kandang saat suhu terlalu dingin. Lampu juga akan menyala otomatis jika suhu di bawah 20°C.
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center pt-2">
+                <div class="lg:col-span-2">
+                    <h3 class="text-base font-bold text-gray-800">Lampu Pemanas (Heater Lamp)</h3>
+                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">
+                        Aktifkan lampu pemanas secara manual untuk menghangatkan kandang saat suhu dingin. Lampu menyala otomatis jika suhu di bawah 20°C.
                     </p>
                 </div>
-                <div class="flex justify-center md:justify-end">
+                <div class="flex justify-end">
                     <button
                         type="button"
                         id="lampuBtn"
                         onclick="toggleLampu()"
-                        class="w-full sm:w-auto px-8 py-5 text-white font-extrabold text-sm rounded-2xl tracking-wide transition-all shadow-md active:scale-95 duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-amber-600 hover:bg-amber-500 focus:outline-none"
+                        class="w-full sm:w-auto px-6 py-3.5 text-slate-700 font-bold text-sm rounded-xl tracking-wide transition-all shadow-sm active:scale-95 duration-300 bg-slate-100 hover:bg-slate-200 border border-slate-300 focus:outline-none"
                     >
                         💡 Aktifkan Lampu Manual
                     </button>
                 </div>
             </div>
-
-            </div>
         </div>
 
     </main>
 
-    {{-- Footer - White with black text --}}
-    <footer class="w-full mt-auto">
-        <div class="footer-gradient h-[2px]"></div>
-        <div class="bg-white border-t border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
+    {{-- Footer - Sleek Light mode --}}
+    <footer class="w-full mt-auto z-10 relative">
+        <div style="height:2px; background: linear-gradient(90deg, #e5e7eb, #9ca3af, #e5e7eb);"></div>
+        <div class="bg-white border-t border-slate-200 text-slate-500 shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                     {{-- Left: University Branding --}}
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-white border border-slate-200 p-1.5 overflow-hidden shadow-sm">
                             <img src="{{ asset('images/uhn_logo.png') }}" alt="Logo UHN" class="w-full h-full object-contain">
                         </div>
                         <div>
-                            <p class="text-gray-900 font-bold text-xs sm:text-sm tracking-wide uppercase">Universitas Harkat Negeri</p>
-                            <p class="text-gray-500 text-[10px] sm:text-xs font-medium tracking-wider uppercase">Prodi Teknik Komputer</p>
+                            <p class="text-gray-900 font-bold text-xs tracking-wide uppercase">Universitas Harkat Negeri</p>
+                            <p class="text-slate-500 text-[10px] font-semibold tracking-wider uppercase">Prodi Teknik Komputer</p>
                         </div>
                     </div>
                     {{-- Right: Copyright --}}
                     <div class="text-center sm:text-right">
-                        <p class="text-gray-800 text-xs sm:text-sm font-semibold">&copy; {{ date('Y') }} Tugas Akhir</p>
-                        <p class="text-gray-400 text-[10px] sm:text-xs font-medium tracking-wider uppercase">All Rights Reserved</p>
+                        <p class="text-gray-800 text-xs font-semibold">&copy; {{ date('Y') }} Tugas Akhir</p>
+                        <p class="text-gray-400 text-[10px] font-medium tracking-wider uppercase">All Rights Reserved</p>
                     </div>
                 </div>
             </div>
@@ -441,29 +477,29 @@
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             
-            toast.className = `flex items-center gap-3 p-4 rounded-2xl shadow-xl border backdrop-blur-xl animate-slide-in transition-all duration-300`;
+            toast.className = `flex items-center gap-3.5 p-4 rounded-2xl shadow-xl border backdrop-blur-xl animate-slide-in transition-all duration-300`;
             
             let bgClass, borderClass, textClass, iconSvg;
 
             if (type === 'success') {
-                bgClass = 'bg-white/95';
+                bgClass = 'bg-white text-slate-800';
                 borderClass = 'border-green-200';
-                textClass = 'text-gray-800';
-                iconSvg = `<div class="w-8 h-8 rounded-xl bg-green-100 flex items-center justify-center text-green-600 flex-shrink-0">
+                textClass = 'text-slate-800';
+                iconSvg = `<div class="w-8 h-8 rounded-xl bg-green-50 flex items-center justify-center text-green-600 flex-shrink-0 border border-green-200">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                 </div>`;
             } else if (type === 'info') {
-                bgClass = 'bg-white/95';
+                bgClass = 'bg-white text-slate-800';
                 borderClass = 'border-blue-200';
-                textClass = 'text-gray-800';
-                iconSvg = `<div class="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0">
+                textClass = 'text-slate-800';
+                iconSvg = `<div class="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 flex-shrink-0 border border-blue-200">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </div>`;
             } else { // error
-                bgClass = 'bg-red-50/95';
+                bgClass = 'bg-red-50 text-red-900';
                 borderClass = 'border-red-200';
-                textClass = 'text-red-900';
-                iconSvg = `<div class="w-8 h-8 rounded-xl bg-red-150 flex items-center justify-center text-red-600 flex-shrink-0">
+                textClass = 'text-red-905';
+                iconSvg = `<div class="w-8 h-8 rounded-xl bg-red-100 flex items-center justify-center text-red-650 flex-shrink-0 border border-red-200">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                 </div>`;
             }
@@ -474,7 +510,7 @@
                 <div class="flex-grow">
                     <p class="text-sm font-semibold">${message}</p>
                 </div>
-                <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-gray-600 transition-colors ml-2">
+                <button onclick="this.parentElement.remove()" class="text-slate-450 hover:text-slate-700 transition-colors ml-2 p-1 hover:bg-slate-100 rounded">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             `;
@@ -494,18 +530,16 @@
             const badge = document.getElementById('sprayerStatusBadge');
             
             if (isActive) {
-                // Active State (Blinking Green)
-                btn.className = "w-full sm:w-auto px-8 py-5 text-white font-extrabold text-sm rounded-2xl tracking-wide transition-all shadow-md active:scale-95 duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-green-600 hover:bg-green-500 pulse-ring-active animate-blink focus:outline-none";
+                btn.className = "w-full sm:w-auto px-6 py-3.5 text-white font-bold text-sm rounded-xl tracking-wide transition-all shadow-md active:scale-95 duration-300 bg-green-600 hover:bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)] focus:outline-none pulse-ring-green";
                 btn.textContent = "✅ Penyemprot Aktif - Klik untuk Matikan";
                 
-                badge.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 animate-pulse border border-green-200";
+                badge.className = "px-2 py-0.5 rounded-full text-2xs font-extrabold bg-green-50 text-green-700 border border-green-200 uppercase animate-pulse";
                 badge.textContent = "AKTIF";
             } else {
-                // Inactive State (Pulse Red)
-                btn.className = "w-full sm:w-auto px-8 py-5 text-white font-extrabold text-sm rounded-2xl tracking-wide transition-all shadow-md active:scale-95 duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-red-600 hover:bg-red-500 pulse-ring focus:outline-none";
+                btn.className = "w-full sm:w-auto px-6 py-3.5 text-slate-700 font-bold text-sm rounded-xl tracking-wide transition-all shadow-sm active:scale-95 duration-300 bg-slate-100 hover:bg-slate-200 border border-slate-300 focus:outline-none";
                 btn.textContent = "🚨 Aktifkan Penyemprot Amonia";
                 
-                badge.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200";
+                badge.className = "px-2 py-0.5 rounded-full text-2xs font-extrabold bg-slate-50 text-slate-500 border border-slate-250 uppercase";
                 badge.textContent = "NONAKTIF";
             }
         }
@@ -547,16 +581,16 @@
             const badge = document.getElementById('kipasStatusBadge');
             
             if (isActive) {
-                btn.className = "w-full sm:w-auto px-8 py-5 text-white font-extrabold text-sm rounded-2xl tracking-wide transition-all shadow-md active:scale-95 duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-green-600 hover:bg-green-500 animate-blink focus:outline-none";
+                btn.className = "w-full sm:w-auto px-6 py-3.5 text-white font-bold text-sm rounded-xl tracking-wide transition-all shadow-md active:scale-95 duration-300 bg-blue-600 hover:bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)] focus:outline-none pulse-ring-blue";
                 btn.textContent = "✅ Kipas Aktif - Klik untuk Matikan";
                 
-                badge.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 animate-pulse border border-green-200";
+                badge.className = "px-2 py-0.5 rounded-full text-2xs font-extrabold bg-blue-50 text-blue-700 border border-blue-200 uppercase animate-pulse";
                 badge.textContent = "AKTIF";
             } else {
-                btn.className = "w-full sm:w-auto px-8 py-5 text-white font-extrabold text-sm rounded-2xl tracking-wide transition-all shadow-md active:scale-95 duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-500 focus:outline-none";
+                btn.className = "w-full sm:w-auto px-6 py-3.5 text-slate-700 font-bold text-sm rounded-xl tracking-wide transition-all shadow-sm active:scale-95 duration-300 bg-slate-100 hover:bg-slate-200 border border-slate-300 focus:outline-none";
                 btn.textContent = "💨 Aktifkan Kipas Manual";
                 
-                badge.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200";
+                badge.className = "px-2 py-0.5 rounded-full text-2xs font-extrabold bg-slate-50 text-slate-500 border border-slate-250 uppercase";
                 badge.textContent = "NONAKTIF";
             }
         }
@@ -598,16 +632,16 @@
             const badge = document.getElementById('lampuStatusBadge');
             
             if (isActive) {
-                btn.className = "w-full sm:w-auto px-8 py-5 text-white font-extrabold text-sm rounded-2xl tracking-wide transition-all shadow-md active:scale-95 duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-green-600 hover:bg-green-500 animate-blink focus:outline-none";
+                btn.className = "w-full sm:w-auto px-6 py-3.5 text-white font-bold text-sm rounded-xl tracking-wide transition-all shadow-md active:scale-95 duration-300 bg-amber-500 hover:bg-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.3)] focus:outline-none pulse-ring-amber";
                 btn.textContent = "✅ Lampu Aktif - Klik untuk Matikan";
                 
-                badge.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 animate-pulse border border-green-200";
+                badge.className = "px-2 py-0.5 rounded-full text-2xs font-extrabold bg-amber-50 text-amber-700 border border-amber-200 uppercase animate-pulse";
                 badge.textContent = "AKTIF";
             } else {
-                btn.className = "w-full sm:w-auto px-8 py-5 text-white font-extrabold text-sm rounded-2xl tracking-wide transition-all shadow-md active:scale-95 duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-amber-600 hover:bg-amber-500 focus:outline-none";
+                btn.className = "w-full sm:w-auto px-6 py-3.5 text-slate-700 font-bold text-sm rounded-xl tracking-wide transition-all shadow-sm active:scale-95 duration-300 bg-slate-100 hover:bg-slate-200 border border-slate-300 focus:outline-none";
                 btn.textContent = "💡 Aktifkan Lampu Manual";
                 
-                badge.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200";
+                badge.className = "px-2 py-0.5 rounded-full text-2xs font-extrabold bg-slate-50 text-slate-500 border border-slate-250 uppercase";
                 badge.textContent = "NONAKTIF";
             }
         }
@@ -658,25 +692,24 @@
             const suhuCard = document.getElementById('suhuCard');
             const suhuBadge = document.getElementById('suhuBadge');
             const suhuIconBg = document.getElementById('suhuIconBg');
-            const suhuIcon = document.getElementById('suhuIcon');
 
             if (data.suhu > 35.0) { // Bahaya
-                suhuBadge.className = "px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full uppercase tracking-wider animate-pulse";
+                suhuBadge.className = "px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full border border-red-200 uppercase tracking-wider animate-pulse";
                 suhuBadge.textContent = "BAHAYA";
-                suhuCard.className = "card-hover bg-red-50/20 rounded-3xl p-6 border border-red-300 shadow-md ring-2 ring-red-500/5 transition-all duration-300";
-                suhuIconBg.className = "w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-600 flex-shrink-0";
-                suhuBar.className = "bg-gradient-to-r from-red-500 to-rose-600 h-2.5 rounded-full transition-all duration-500";
+                suhuCard.className = "card-hover bg-red-50 border border-red-300 shadow-md ring-2 ring-red-500/5 transition-all duration-300 rounded-3xl p-6";
+                suhuIconBg.className = "w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-600 flex-shrink-0 border border-red-200";
+                suhuBar.className = "bg-gradient-to-r from-red-500 to-rose-500 h-2.5 rounded-full transition-all duration-500";
             } else if (data.suhu > 33.0) { // Waspada
-                suhuBadge.className = "px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full uppercase tracking-wider";
+                suhuBadge.className = "px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full border border-yellow-200 uppercase tracking-wider";
                 suhuBadge.textContent = "WASPADA";
-                suhuCard.className = "card-hover bg-yellow-50/10 rounded-3xl p-6 border border-yellow-300 shadow-sm transition-all duration-300";
-                suhuIconBg.className = "w-12 h-12 bg-yellow-100 rounded-2xl flex items-center justify-center text-yellow-600 flex-shrink-0";
+                suhuCard.className = "card-hover bg-yellow-50 border border-yellow-250 shadow-sm transition-all duration-300 rounded-3xl p-6";
+                suhuIconBg.className = "w-12 h-12 bg-yellow-100 rounded-2xl flex items-center justify-center text-yellow-600 flex-shrink-0 border border-yellow-200";
                 suhuBar.className = "bg-gradient-to-r from-yellow-400 to-amber-500 h-2.5 rounded-full transition-all duration-500";
             } else { // Normal
-                suhuBadge.className = "px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full uppercase tracking-wider";
+                suhuBadge.className = "px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-full border border-green-200 uppercase tracking-wider";
                 suhuBadge.textContent = "NORMAL";
-                suhuCard.className = "card-hover bg-white rounded-3xl p-6 border border-gray-100 shadow-sm transition-all duration-300";
-                suhuIconBg.className = "w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 flex-shrink-0";
+                suhuCard.className = "card-hover bg-white border border-slate-200/80 shadow-sm transition-all duration-300 rounded-3xl p-6";
+                suhuIconBg.className = "w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 flex-shrink-0 border border-orange-100";
                 suhuBar.className = "bg-gradient-to-r from-orange-400 to-orange-500 h-2.5 rounded-full transition-all duration-500";
             }
 
@@ -693,22 +726,22 @@
             const kelembapanIconBg = document.getElementById('kelembapanIconBg');
 
             if (data.kelembapan < 40.0 || data.kelembapan > 80.0) { // Bahaya
-                kelembapanBadge.className = "px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full uppercase tracking-wider animate-pulse";
+                kelembapanBadge.className = "px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full border border-red-200 uppercase tracking-wider animate-pulse";
                 kelembapanBadge.textContent = "BAHAYA";
-                kelembapanCard.className = "card-hover bg-red-50/20 rounded-3xl p-6 border border-red-300 shadow-md ring-2 ring-red-500/5 transition-all duration-300";
-                kelembapanIconBg.className = "w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-600 flex-shrink-0";
-                kelembapanBar.className = "bg-gradient-to-r from-red-500 to-rose-600 h-2.5 rounded-full transition-all duration-500";
+                kelembapanCard.className = "card-hover bg-red-50 border border-red-300 shadow-md ring-2 ring-red-500/5 transition-all duration-300 rounded-3xl p-6";
+                kelembapanIconBg.className = "w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-600 flex-shrink-0 border border-red-200";
+                kelembapanBar.className = "bg-gradient-to-r from-red-500 to-rose-500 h-2.5 rounded-full transition-all duration-500";
             } else if (data.kelembapan < 50.0 || data.kelembapan > 75.0) { // Waspada
-                kelembapanBadge.className = "px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full uppercase tracking-wider";
+                kelembapanBadge.className = "px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full border border-yellow-200 uppercase tracking-wider";
                 kelembapanBadge.textContent = "WASPADA";
-                kelembapanCard.className = "card-hover bg-yellow-50/10 rounded-3xl p-6 border border-yellow-300 shadow-sm transition-all duration-300";
-                kelembapanIconBg.className = "w-12 h-12 bg-yellow-100 rounded-2xl flex items-center justify-center text-yellow-600 flex-shrink-0";
+                kelembapanCard.className = "card-hover bg-yellow-50 border border-yellow-250 shadow-sm transition-all duration-300 rounded-3xl p-6";
+                kelembapanIconBg.className = "w-12 h-12 bg-yellow-100 rounded-2xl flex items-center justify-center text-yellow-600 flex-shrink-0 border border-yellow-200";
                 kelembapanBar.className = "bg-gradient-to-r from-yellow-400 to-amber-500 h-2.5 rounded-full transition-all duration-500";
             } else { // Normal
-                kelembapanBadge.className = "px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full uppercase tracking-wider";
+                kelembapanBadge.className = "px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-full border border-green-200 uppercase tracking-wider";
                 kelembapanBadge.textContent = "NORMAL";
-                kelembapanCard.className = "card-hover bg-white rounded-3xl p-6 border border-gray-100 shadow-sm transition-all duration-300";
-                kelembapanIconBg.className = "w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 flex-shrink-0";
+                kelembapanCard.className = "card-hover bg-white border border-slate-200/80 shadow-sm transition-all duration-300 rounded-3xl p-6";
+                kelembapanIconBg.className = "w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 flex-shrink-0 border border-blue-100";
                 kelembapanBar.className = "bg-gradient-to-r from-blue-400 to-blue-500 h-2.5 rounded-full transition-all duration-500";
             }
 
@@ -725,22 +758,22 @@
             const amoniaIconBg = document.getElementById('amoniaIconBg');
 
             if (data.amonia > 25.0) { // Bahaya
-                amoniaBadge.className = "px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full uppercase tracking-wider animate-pulse";
+                amoniaBadge.className = "px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full border border-red-200 uppercase tracking-wider animate-pulse";
                 amoniaBadge.textContent = "BAHAYA";
-                amoniaCard.className = "card-hover bg-red-50/20 rounded-3xl p-6 border border-red-300 shadow-md ring-2 ring-red-500/5 transition-all duration-300";
-                amoniaIconBg.className = "w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-600 flex-shrink-0";
-                amoniaBar.className = "bg-gradient-to-r from-red-500 to-rose-600 h-2.5 rounded-full transition-all duration-500";
+                amoniaCard.className = "card-hover bg-red-50 border border-red-300 shadow-md ring-2 ring-red-500/5 transition-all duration-300 rounded-3xl p-6";
+                amoniaIconBg.className = "w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-650 flex-shrink-0 border border-red-200";
+                amoniaBar.className = "bg-gradient-to-r from-red-500 to-rose-500 h-2.5 rounded-full transition-all duration-500";
             } else if (data.amonia > 20.0) { // Waspada
-                amoniaBadge.className = "px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full uppercase tracking-wider";
+                amoniaBadge.className = "px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full border border-yellow-200 uppercase tracking-wider";
                 amoniaBadge.textContent = "WASPADA";
-                amoniaCard.className = "card-hover bg-yellow-50/10 rounded-3xl p-6 border border-yellow-300 shadow-sm transition-all duration-300";
-                amoniaIconBg.className = "w-12 h-12 bg-yellow-100 rounded-2xl flex items-center justify-center text-yellow-600 flex-shrink-0";
+                amoniaCard.className = "card-hover bg-yellow-55 border border-yellow-250 shadow-sm transition-all duration-300 rounded-3xl p-6";
+                amoniaIconBg.className = "w-12 h-12 bg-yellow-100 rounded-2xl flex items-center justify-center text-yellow-650 flex-shrink-0 border border-yellow-200";
                 amoniaBar.className = "bg-gradient-to-r from-yellow-400 to-amber-500 h-2.5 rounded-full transition-all duration-500";
             } else { // Normal
-                amoniaBadge.className = "px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full uppercase tracking-wider";
+                amoniaBadge.className = "px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-full border border-green-200 uppercase tracking-wider";
                 amoniaBadge.textContent = "NORMAL";
-                amoniaCard.className = "card-hover bg-white rounded-3xl p-6 border border-gray-100 shadow-sm transition-all duration-300";
-                amoniaIconBg.className = "w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-500 flex-shrink-0";
+                amoniaCard.className = "card-hover bg-white border border-slate-200/80 shadow-sm transition-all duration-300 rounded-3xl p-6";
+                amoniaIconBg.className = "w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-550 flex-shrink-0 border border-purple-100";
                 amoniaBar.className = "bg-gradient-to-r from-purple-400 to-purple-500 h-2.5 rounded-full transition-all duration-500";
             }
 
@@ -759,18 +792,54 @@
         function updateActuatorStatus(name, isActive) {
             const icon = document.getElementById(name + 'StatusIcon');
             const text = document.getElementById(name + 'StatusText');
+            const led = document.getElementById(name + 'Led');
             if (!icon || !text) return;
 
+            let activeColorClass = 'text-green-605';
+            let activeBgClass = 'bg-green-50 border-green-200/60';
+            let ledActiveColor = 'bg-green-500 shadow-[0_0_12px_#22c55e]';
+            
+            if (name === 'kipas') {
+                activeColorClass = 'text-blue-600';
+                activeBgClass = 'bg-blue-50 border-blue-200/60';
+                ledActiveColor = 'bg-blue-500 shadow-[0_0_12px_#3b82f6]';
+                if (isActive) {
+                    icon.querySelector('svg').classList.add('animate-spin');
+                } else {
+                    icon.querySelector('svg').classList.remove('animate-spin');
+                }
+            } else if (name === 'pompa') {
+                activeColorClass = 'text-emerald-600';
+                activeBgClass = 'bg-emerald-50 border-emerald-200/60';
+                ledActiveColor = 'bg-emerald-500 shadow-[0_0_12px_#10b981]';
+                if (isActive) {
+                    icon.querySelector('svg').classList.add('animate-pulse');
+                } else {
+                    icon.querySelector('svg').classList.remove('animate-pulse');
+                }
+            } else if (name === 'lampu') {
+                activeColorClass = 'text-amber-600';
+                activeBgClass = 'bg-amber-50 border-amber-250';
+                ledActiveColor = 'bg-amber-500 shadow-[0_0_12px_#f59e0b]';
+                if (isActive) {
+                    icon.className = 'w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0 animate-pulse-glow border border-amber-250';
+                }
+            }
+
             if (isActive) {
-                icon.className = 'w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0';
-                icon.querySelector('svg').className.baseVal = 'w-5 h-5 text-green-600';
+                if (name !== 'lampu') {
+                    icon.className = `w-10 h-10 rounded-xl ${activeBgClass} flex items-center justify-center flex-shrink-0 border transition-all duration-300 shadow-sm`;
+                }
+                icon.querySelector('svg').className.baseVal = `w-5 h-5 ${activeColorClass}`;
                 text.textContent = 'MENYALA';
-                text.className = 'text-sm font-bold text-green-600';
+                text.className = `text-sm font-bold ${activeColorClass}`;
+                if (led) led.className = `w-3 h-3 rounded-full ${ledActiveColor} transition-all duration-300`;
             } else {
-                icon.className = 'w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0';
-                icon.querySelector('svg').className.baseVal = 'w-5 h-5 text-gray-400';
+                icon.className = 'w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center flex-shrink-0 transition-all duration-300 border border-slate-200';
+                icon.querySelector('svg').className.baseVal = 'w-5 h-5 text-slate-400';
                 text.textContent = 'MATI';
-                text.className = 'text-sm font-bold text-gray-400';
+                text.className = 'text-sm font-bold text-slate-400';
+                if (led) led.className = 'w-3 h-3 rounded-full bg-slate-200 transition-all duration-300 shadow-sm border border-slate-300/30';
             }
         }
 
@@ -783,7 +852,6 @@
                 updateDashboard(data);
             } catch (error) {
                 console.error("Gagal sinkronisasi data sensor:", error);
-                // Fail silently or log to console. To avoid spamming user with toasts, we don't trigger toast every time.
             }
         }
 
@@ -803,14 +871,12 @@
             if (sessionStorage.getItem('welcomeShown')) return;
             const toast = document.getElementById('welcomeToast');
             toast.style.display = 'flex';
-            // Trigger animation in next frame
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                     toast.classList.remove('opacity-0', 'translate-y-2');
                     toast.classList.add('opacity-100', 'translate-y-0');
                 });
             });
-            // Auto-dismiss after 3 seconds
             setTimeout(dismissWelcome, 3000);
         })();
 
@@ -819,6 +885,7 @@
         let lastScrollY = 0;
         let ticking = false;
 
+        // Navbar scroll effect
         function handleNavbarScroll() {
             if (window.scrollY > 10) {
                 navbar.classList.add('navbar-scrolled');
