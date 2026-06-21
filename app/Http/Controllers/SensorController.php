@@ -11,51 +11,55 @@ use Illuminate\Http\Request;
 class SensorController extends Controller
 {
     /**
-     * Mengambil data sensor terbaru untuk Dashboard.
-     * Menampilkan data real dari ESP8266.
-     */
-    public function latest()
-    {
-        $latest = SensorData::latest('id')->first();
+ * Mengambil data sensor terbaru untuk Dashboard.
+ * Prioritas: Manual Log > Sensor Data (otomatis dari ESP)
+ */
+public function latest()
+{
+    $latest = SensorData::latest('id')->first();
 
-        if (!$latest) {
-            // Belum ada data sensor dari ESP, tampilkan placeholder
-            return response()->json([
-                'suhu' => 0,
-                'kelembapan' => 0,
-                'amonia' => 0,
-                'status' => 'menunggu',
-                'created_at' => now()->format('Y-m-d H:i:s'),
-                'sprayer_active' => false,
-                'kipas_active' => false,
-                'lampu_active' => false,
-            ]);
-        }
-
-        $latestSprayer = SprayerLog::latest('id')->first();
-$latestKipas   = KipasLog::latest('id')->first();
-$latestLampu   = LampuLog::latest('id')->first();
-
-return response()->json([
-    'suhu' => $latest->suhu,
-    'kelembapan' => $latest->kelembapan,
-    'amonia' => $latest->amonia,
-    'status' => $latest->status,
-    'created_at' => $latest->created_at->format('Y-m-d H:i:s'),
-
-    'sprayer_active' => $latestSprayer
-        ? ($latestSprayer->aksi === 'aktif')
-        : false,
-
-    'kipas_active' => $latestKipas
-        ? ($latestKipas->aksi === 'aktif')
-        : false,
-
-    'lampu_active' => $latestLampu
-        ? ($latestLampu->aksi === 'aktif')
-        : false,
-]);
+    if (!$latest) {
+        return response()->json([
+            'suhu' => 0,
+            'kelembapan' => 0,
+            'amonia' => 0,
+            'status' => 'menunggu',
+            'created_at' => now()->format('Y-m-d H:i:s'),
+            'sprayer_active' => false,
+            'kipas_active' => false,
+            'lampu_active' => false,
+        ]);
     }
+
+    // ✅ FIX: Cek manual log dulu, jika tidak ada gunakan status otomatis dari SensorData
+    $latestSprayer = SprayerLog::latest('id')->first();
+    $latestKipas   = KipasLog::latest('id')->first();
+    $latestLampu   = LampuLog::latest('id')->first();
+
+    // Prioritas: Manual Log (dari tombol) > Sensor Data (dari ESP otomatis)
+    $sprayerActive = $latestSprayer 
+        ? ($latestSprayer->aksi === 'aktif')
+        : (bool)$latest->sprayer_active;  // ✅ Fallback ke SensorData
+
+    $kipasActive = $latestKipas 
+        ? ($latestKipas->aksi === 'aktif')
+        : (bool)$latest->kipas_active;    // ✅ Fallback ke SensorData
+
+    $lampuActive = $latestLampu 
+        ? ($latestLampu->aksi === 'aktif')
+        : (bool)$latest->lampu_active;    // ✅ Fallback ke SensorData
+
+    return response()->json([
+        'suhu' => $latest->suhu,
+        'kelembapan' => $latest->kelembapan,
+        'amonia' => $latest->amonia,
+        'status' => $latest->status,
+        'created_at' => $latest->created_at->format('Y-m-d H:i:s'),
+        'sprayer_active' => $sprayerActive,
+        'kipas_active' => $kipasActive,
+        'lampu_active' => $lampuActive,
+    ]);
+}
 
     /**
      * Mengaktifkan/menonaktifkan sprayer secara manual dari Dashboard.
