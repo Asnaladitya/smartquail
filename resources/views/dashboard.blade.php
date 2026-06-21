@@ -750,9 +750,9 @@
             if (!isLampuLocked) updateLampuButton(data.lampu_active);
 
             // Update Actuator Status Indicators
-            updateActuatorStatus('kipas', data.kipas_active);
-            updateActuatorStatus('pompa', data.sprayer_active);
-            updateActuatorStatus('lampu', data.lampu_active);
+            updateActuatorStatus('kipas', data.kipas_actual);
+            updateActuatorStatus('pompa', data.sprayer_actual);
+            updateActuatorStatus('lampu', data.lampu_actual);
         }
 
         // Update individual actuator status indicator

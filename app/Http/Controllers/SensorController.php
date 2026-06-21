@@ -28,6 +28,9 @@ public function latest()
             'sprayer_active' => false,
             'kipas_active' => false,
             'lampu_active' => false,
+            'sprayer_actual' => false,
+            'kipas_actual' => false,
+            'lampu_actual' => false,
         ]);
     }
 
@@ -58,6 +61,9 @@ public function latest()
         'sprayer_active' => $sprayerActive,
         'kipas_active' => $kipasActive,
         'lampu_active' => $lampuActive,
+        'sprayer_actual' => (bool)$latest->sprayer_active,
+        'kipas_actual' => (bool)$latest->kipas_active,
+        'lampu_actual' => (bool)$latest->lampu_active,
     ]);
 }
 
